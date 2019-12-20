@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
-/*
-using AgentFramework.Core.Contracts;
-using AgentFramework.Core.Messages.Connections;
-using AgentFramework.Core.Exceptions;
-*/
 using Osma.Mobile.App.Events;
 using Osma.Mobile.App.Services.Interfaces;
+using Hyperledger.Aries;
 using ReactiveUI;
 using Xamarin.Forms;
 using Hyperledger.Aries.Features.DidExchange;
 using Hyperledger.Aries.Configuration;
 using Hyperledger.Aries.Agents;
 using Hyperledger.Aries.Contracts;
+using System.Diagnostics;
 
 namespace Osma.Mobile.App.ViewModels.Connections
 {
@@ -65,11 +63,11 @@ namespace Osma.Mobile.App.ViewModels.Connections
             var (msg, rec) = await _connectionService.CreateRequestAsync(context, _invite);
             if (isEndpointUriAbsent)
             {
-                var rsp = await _messageService.SendReceiveAsync<ConnectionResponseMessage>(context.Wallet, msg, rec.TheirVk, _invite.RecipientKeys.First());
+                var rsp = await _messageService.SendReceiveAsync<ConnectionResponseMessage>(context.Wallet, msg, _invite.RecipientKeys.First(), _invite.ServiceEndpoint);
                 await _connectionService.ProcessResponseAsync(context, rsp, rec);
             } else
             {
-                await _messageService.SendAsync(context.Wallet, msg, rec.TheirVk, _invite.RecipientKeys.First());
+                await _messageService.SendAsync(context.Wallet, msg, _invite.RecipientKeys.First(), _invite.ServiceEndpoint);
             }
         }
 
@@ -93,13 +91,14 @@ namespace Osma.Mobile.App.ViewModels.Connections
                 var context = await _contextProvider.GetContextAsync();
                 await CreateConnection(context, _invite);
             }
-            /*catch (AgentFrameworkException agentFrameworkException)
+            catch (AriesFrameworkException agentFrameworkException)
             {
                 errorMessage = agentFrameworkException.Message;
-            }*/
-            catch (Exception) //TODO more granular error protection
+            }
+            catch (Exception e) //TODO more granular error protection
             {
                 errorMessage = GENERIC_CONNECTION_REQUEST_FAILURE_MESSAGE;
+                Debug.WriteLine(e);
             }
 
             _eventAggregator.Publish(new ApplicationEvent() { Type = ApplicationEventType.ConnectionsUpdated });
