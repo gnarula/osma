@@ -31,7 +31,6 @@
     <PackageReference Include="ZXing.Net.Mobile.Forms" Version="2.4.1" />
     <PackageReference Include="Xamarin.FFImageLoading.Transformations" Version="2.4.4.859" />
     <PackageReference Include="Xamarin.Essentials" Version="1.0.0" />
-    <PackageReference Include="Hyperledger.Aries" Version="1.0.4" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
   </ItemGroup>
 
@@ -72,6 +71,7 @@
     <Folder Include="Views\Components\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\aries-framework-dotnet\src\Hyperledger.Aries\Hyperledger.Aries.csproj" />
     <ProjectReference Include="..\Osma.Mobile.App.Services\Osma.Mobile.App.Services.csproj" />
   </ItemGroup>
   <ItemGroup>

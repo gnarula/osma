@@ -156,13 +156,17 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\Osma.Mobile.App.Services\Osma.Mobile.App.Services.csproj">
-      <Project>{e7fe6690-dc37-46ad-ae52-710028f17034}</Project>
-      <Name>Osma.Mobile.App.Services</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Osma.Mobile.App\Osma.Mobile.App.csproj">
       <Project>{EC35F9B5-1255-4613-B865-FF7FA07606A6}</Project>
       <Name>Osma.Mobile.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Osma.Mobile.App.Services\Osma.Mobile.App.Services.csproj">
+      <Project>{E7FE6690-DC37-46AD-AE52-710028F17034}</Project>
+      <Name>Osma.Mobile.App.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aries-framework-dotnet\src\Hyperledger.Aries\Hyperledger.Aries.csproj">
+      <Project>{F8571385-4363-40CA-B56C-A5499266496B}</Project>
+      <Name>Hyperledger.Aries</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

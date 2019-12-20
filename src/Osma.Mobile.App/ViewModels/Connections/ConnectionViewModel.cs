@@ -78,7 +78,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
 
             try
             {
-                protocols = await _messageService.SendReceiveAsync<DiscoveryDiscloseMessage>(context.Wallet, message, _record.TheirVk, null);
+                protocols = await _messageService.SendReceiveAsync<DiscoveryDiscloseMessage>(context.Wallet, message, _record.TheirVk, _record.Endpoint.Uri);
             }
             catch (Exception)
             {

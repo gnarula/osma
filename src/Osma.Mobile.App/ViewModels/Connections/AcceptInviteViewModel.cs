@@ -14,6 +14,7 @@ using Hyperledger.Aries.Configuration;
 using Hyperledger.Aries.Agents;
 using Hyperledger.Aries.Contracts;
 using System.Diagnostics;
+using Hyperledger.Aries;
 
 namespace Osma.Mobile.App.ViewModels.Connections
 {
@@ -61,14 +62,16 @@ namespace Osma.Mobile.App.ViewModels.Connections
             var provisioningRecord = await _provisioningService.GetProvisioningAsync(context.Wallet);
             var isEndpointUriAbsent = provisioningRecord.Endpoint.Uri == null;
             var (msg, rec) = await _connectionService.CreateRequestAsync(context, _invite);
-            if (isEndpointUriAbsent)
+            /*if (isEndpointUriAbsent)
             {
                 var rsp = await _messageService.SendReceiveAsync<ConnectionResponseMessage>(context.Wallet, msg, _invite.RecipientKeys.First(), _invite.ServiceEndpoint);
                 await _connectionService.ProcessResponseAsync(context, rsp, rec);
             } else
             {
                 await _messageService.SendAsync(context.Wallet, msg, _invite.RecipientKeys.First(), _invite.ServiceEndpoint);
-            }
+            }*/
+            var rsp = await _messageService.SendReceiveAsync<ConnectionResponseMessage>(context.Wallet, msg, _invite.RecipientKeys.First(), rec.Endpoint.Uri, _invite.RoutingKeys.ToArray(), rec.MyVk);
+            await _connectionService.ProcessResponseAsync(context, rsp, rec);
         }
 
         #region Bindable Commands
