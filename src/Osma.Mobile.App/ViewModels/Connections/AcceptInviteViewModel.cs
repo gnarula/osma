@@ -3,13 +3,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
+/*
 using AgentFramework.Core.Contracts;
 using AgentFramework.Core.Messages.Connections;
 using AgentFramework.Core.Exceptions;
+*/
 using Osma.Mobile.App.Events;
 using Osma.Mobile.App.Services.Interfaces;
 using ReactiveUI;
 using Xamarin.Forms;
+using Hyperledger.Aries.Features.DidExchange;
+using Hyperledger.Aries.Configuration;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Contracts;
 
 namespace Osma.Mobile.App.ViewModels.Connections
 {
@@ -18,7 +24,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
         private readonly IProvisioningService _provisioningService;
         private readonly IConnectionService _connectionService;
         private readonly IMessageService _messageService;
-        private readonly ICustomAgentContextProvider _contextProvider;
+        private readonly IAgentProvider _contextProvider;
         private readonly IEventAggregator _eventAggregator;
         private static readonly String GENERIC_CONNECTION_REQUEST_FAILURE_MESSAGE = "Failed to accept invite!";
 
@@ -29,7 +35,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
                                      IProvisioningService provisioningService,
                                      IConnectionService connectionService,
                                      IMessageService messageService,
-                                     ICustomAgentContextProvider contextProvider,
+                                     IAgentProvider contextProvider,
                                      IEventAggregator eventAggregator)
                                      : base("Accept Invitiation", userDialogs, navigationService)
         {
@@ -37,7 +43,6 @@ namespace Osma.Mobile.App.ViewModels.Connections
             _connectionService = connectionService;
             _contextProvider = contextProvider;
             _messageService = messageService;
-            _contextProvider = contextProvider;
             _eventAggregator = eventAggregator;
         }
 
@@ -58,10 +63,13 @@ namespace Osma.Mobile.App.ViewModels.Connections
             var provisioningRecord = await _provisioningService.GetProvisioningAsync(context.Wallet);
             var isEndpointUriAbsent = provisioningRecord.Endpoint.Uri == null;
             var (msg, rec) = await _connectionService.CreateRequestAsync(context, _invite);
-            var rsp = await _messageService.SendAsync(context.Wallet, msg, rec, _invite.RecipientKeys.First(), isEndpointUriAbsent);
             if (isEndpointUriAbsent)
             {
-                await _connectionService.ProcessResponseAsync(context, rsp.GetMessage<ConnectionResponseMessage>(), rec);
+                var rsp = await _messageService.SendReceiveAsync<ConnectionResponseMessage>(context.Wallet, msg, rec.TheirVk, _invite.RecipientKeys.First());
+                await _connectionService.ProcessResponseAsync(context, rsp, rec);
+            } else
+            {
+                await _messageService.SendAsync(context.Wallet, msg, rec.TheirVk, _invite.RecipientKeys.First());
             }
         }
 
@@ -70,9 +78,9 @@ namespace Osma.Mobile.App.ViewModels.Connections
         {
             var loadingDialog = DialogService.Loading("Processing");
 
-            var context = await _contextProvider.GetContextAsync();
+            //var context = await _contextProvider.GetContextAsync();
 
-            if (context == null || _invite == null)
+            if (_contextProvider == null || _invite == null)
             {
                 loadingDialog.Hide();
                 DialogService.Alert("Failed to decode invite!");
@@ -82,12 +90,13 @@ namespace Osma.Mobile.App.ViewModels.Connections
             String errorMessage = String.Empty;
             try
             {
+                var context = await _contextProvider.GetContextAsync();
                 await CreateConnection(context, _invite);
             }
-            catch (AgentFrameworkException agentFrameworkException)
+            /*catch (AgentFrameworkException agentFrameworkException)
             {
                 errorMessage = agentFrameworkException.Message;
-            }
+            }*/
             catch (Exception) //TODO more granular error protection
             {
                 errorMessage = GENERIC_CONNECTION_REQUEST_FAILURE_MESSAGE;

@@ -1,5 +1,8 @@
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Autofac;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Configuration;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
@@ -29,15 +32,17 @@ namespace Osma.Mobile.App
         public Palette Colors;
 
         private readonly INavigationService _navigationService;
-        private readonly ICustomAgentContextProvider _contextProvider;
-
+        private readonly IAgentProvider _contextProvider;
+        private readonly IProvisioningService _provisioningService;
         public App(IContainer container)
         {
             InitializeComponent();
 
             Colors.Init();
+            container.Resolve<IAgent>();
             _navigationService = container.Resolve<INavigationService>();
-            _contextProvider = container.Resolve<ICustomAgentContextProvider>();
+            _contextProvider = container.Resolve<IAgentProvider>();
+            _provisioningService = container.Resolve<IProvisioningService>();
 
             InitializeTask = Initialize();
         }
@@ -56,14 +61,18 @@ namespace Osma.Mobile.App
             _navigationService.AddPageViewModelBinding<AccountViewModel, AccountPage>();
             _navigationService.AddPageViewModelBinding<CreateInvitationViewModel, CreateInvitationPage>();
 
-            if (_contextProvider.AgentExists())
-            {
-                await _navigationService.NavigateToAsync<MainViewModel>();
-            }
-            else
-            {
-                await _navigationService.NavigateToAsync<RegisterViewModel>();
-            }
+            //await _provisioningService.ProvisionAgentAsync();
+            //if (_contextProvider.Agent != null)
+            //{
+            Debug.WriteLine("Switching to MainViewModel");
+            //await _navigationService.NavigateToAsync<MainViewModel>();
+            await _navigationService.NavigateToAsync<MainViewModel>();
+            Debug.WriteLine("Switched to MainViewModel");
+            //}
+            //else
+            //{
+            //    await _navigationService.NavigateToAsync<RegisterViewModel>();
+            //}
         }
 
         protected override void OnStart()

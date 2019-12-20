@@ -3,24 +3,28 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
-using AgentFramework.Core.Contracts;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Extensions;
+using Hyperledger.Aries.Features.DidExchange;
+using Hyperledger.Aries.Utils;
+//using AgentFramework.Core.Contracts;
 using Osma.Mobile.App.Services.Interfaces;
 using ReactiveUI;
 using Xamarin.Forms;
 using ZXing.Net.Mobile.Forms;
-using AgentFramework.Core.Extensions;
+//using AgentFramework.Core.Extensions;
 
 namespace Osma.Mobile.App.ViewModels.CreateInvitation
 {
     public class CreateInvitationViewModel : ABaseViewModel
     {
-        private readonly ICustomAgentContextProvider _agentContextProvider;
+        private readonly IAgentProvider _agentContextProvider;
         private readonly IConnectionService _connectionService;
 
         public CreateInvitationViewModel(
             IUserDialogs userDialogs,
             INavigationService navigationService,
-            ICustomAgentContextProvider agentContextProvider,
+            IAgentProvider agentContextProvider,
             IConnectionService defaultConnectionService
             ) : base(
                 "CreateInvitation",
@@ -44,7 +48,7 @@ namespace Osma.Mobile.App.ViewModels.CreateInvitation
                 var context = await _agentContextProvider.GetContextAsync();
                 var (invitation, _) = await _connectionService.CreateInvitationAsync(context);
 
-                string barcodeValue = invitation.ServiceEndpoint + "?c_i=" + MessageUtils(invitation.ToJson().ToBase64());
+                string barcodeValue = invitation.ServiceEndpoint + "?c_i=" + invitation.ToJson().ToBase64();
                 QrCodeValue = barcodeValue;
             }
             catch (Exception ex)

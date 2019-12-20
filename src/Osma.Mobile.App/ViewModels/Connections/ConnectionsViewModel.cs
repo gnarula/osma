@@ -5,10 +5,14 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
-using AgentFramework.Core.Contracts;
-using AgentFramework.Core.Messages.Connections;
-using AgentFramework.Core.Utils;
+//using AgentFramework.Core.Contracts;
+//using AgentFramework.Core.Messages.Connections;
+//using AgentFramework.Core.Utils;
 using Autofac;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Contracts;
+using Hyperledger.Aries.Features.DidExchange;
+using Hyperledger.Aries.Utils;
 using Osma.Mobile.App.Events;
 using Osma.Mobile.App.Extensions;
 using Osma.Mobile.App.Services;
@@ -23,14 +27,14 @@ namespace Osma.Mobile.App.ViewModels.Connections
     public class ConnectionsViewModel : ABaseViewModel
     {
         private readonly IConnectionService _connectionService;
-        private readonly ICustomAgentContextProvider _agentContextProvider;
+        private readonly IAgentProvider _agentContextProvider;
         private readonly IEventAggregator _eventAggregator;
         private readonly ILifetimeScope _scope;
 
         public ConnectionsViewModel(IUserDialogs userDialogs,
                                     INavigationService navigationService,
                                     IConnectionService connectionService,
-                                    ICustomAgentContextProvider agentContextProvider,
+                                    IAgentProvider agentContextProvider,
                                     IEventAggregator eventAggregator,
                                     ILifetimeScope scope) :
                                     base("Connections", userDialogs, navigationService)

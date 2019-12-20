@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Osma.Mobile.App.Services.Interfaces;
 using Osma.Mobile.App.ViewModels.Account;
@@ -32,6 +33,7 @@ namespace Osma.Mobile.App.ViewModels
 
         public override async Task InitializeAsync(object navigationData)
         {
+            Debug.WriteLine("In here intiialzeAsync");
             await Connections.InitializeAsync(null);
             await Credentials.InitializeAsync(null);
             await Account.InitializeAsync(null);

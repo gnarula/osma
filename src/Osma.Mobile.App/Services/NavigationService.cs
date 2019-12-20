@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
@@ -123,11 +124,14 @@ namespace Osma.Mobile.App.Services
         public async Task NavigateToAsync(Page page, NavigationType type = NavigationType.Normal)
         {
             var mainPage = CurrentApplication.MainPage;
-
+            Debug.WriteLine("In here **** ");
             if (type == NavigationType.Modal)
                 await mainPage.Navigation.PushModalAsync(page);
             else
+            {
+                Debug.WriteLine("Pushing Async");
                 await mainPage.Navigation.PushAsync(page);
+            }
         }
 
         public async Task NavigateBackAsync()
@@ -193,13 +197,17 @@ namespace Osma.Mobile.App.Services
         protected virtual async Task InternalNavigateToAsync(Type viewModelType, NavigationType type, object viewModel, object parameter)
         {
             Page page = CreateAndBindPage(viewModelType, viewModel, parameter, false);
-
+            Debug.WriteLine("Page nil? %s", (page == null).ToString());
             if (type == NavigationType.Modal)
-                    await CurrentApplication.MainPage.Navigation.PushModalAsync(page);
+            {
+                await CurrentApplication.MainPage.Navigation.PushModalAsync(page);
+            }
             else
             {
+                Debug.WriteLine("In here, loading page");
                 if (page is IRootView)
                 {
+                    Debug.WriteLine("Page is RootView");
                     object bindingContext = page.BindingContext;
                     page = new NavigationPage(page);
                     NavigationPage.SetHasNavigationBar(page, false);
@@ -207,7 +215,10 @@ namespace Osma.Mobile.App.Services
                     CurrentApplication.MainPage = page;
                 }
                 else if (CurrentApplication.MainPage is NavigationPage navPage)
+                {
+                    Debug.WriteLine("Page is CurrentApplication.MainPage");
                     await navPage.Navigation.PushAsync(page);
+                }
                 //TODO OS-194 else throw exception as the page and Navigation type combination isnt valid
             }
 

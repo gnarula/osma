@@ -10,6 +10,7 @@ using FFImageLoading.Forms.Platform;
 using Java.Lang;
 using Osma.Mobile.App.Converters;
 using Xamarin.Forms;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Osma.Mobile.App.Droid
 {
@@ -55,7 +56,9 @@ namespace Osma.Mobile.App.Droid
                 CheckAndRequestRequiredPermissions();
 
             var builder = new ContainerBuilder();
+
             builder.RegisterModule(new PlatformModule());
+
             var container = builder.Build();
 
             LoadApplication(new App(container));
